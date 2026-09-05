@@ -85,11 +85,6 @@ class GatewayClient {
     this.heartbeatTimer = setInterval(async () => {
       await this.sendHeartbeat();
     }, this.heartbeatIntervalMs);
-
-    // Ensure timer does not prevent process exit during tests/shutdown
-    if (this.heartbeatTimer && typeof this.heartbeatTimer.unref === 'function') {
-      this.heartbeatTimer.unref();
-    }
   }
 
   /**

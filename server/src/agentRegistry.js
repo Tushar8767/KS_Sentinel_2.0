@@ -6,8 +6,8 @@
  * and safe read-only machine telemetry caching.
  */
 
-// Stale timeout: if no heartbeat received within 15 seconds, mark agent offline
-const HEARTBEAT_TIMEOUT_MS = 15000;
+// Stale timeout: if no heartbeat received within window, mark agent offline
+const HEARTBEAT_TIMEOUT_MS = parseInt(process.env.HEARTBEAT_TIMEOUT_MS, 10) || 15000;
 
 class GatewayAgentRegistry {
   constructor() {

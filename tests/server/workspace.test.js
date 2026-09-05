@@ -16,13 +16,19 @@ test('Server Gateway Workspace Management & Persistence (Module 5)', async (t) =
   const port = server.address().port;
   const baseUrl = `http://localhost:${port}`;
 
-  t.after(() => {
+  t.after(async () => {
+    try {
+      await fetch(`${baseUrl}/api/workspaces/ws_default_01/open`, { method: 'POST' });
+    } catch {}
     server.close();
   });
 
   let createdWorkspaceId = null;
 
   await t.test('GET /api/workspaces returns workspace list with default seeded workspace', async () => {
+    // Ensure default workspace is activated as baseline
+    await fetch(`${baseUrl}/api/workspaces/ws_default_01/open`, { method: 'POST' });
+
     const res = await fetch(`${baseUrl}/api/workspaces`);
     assert.equal(res.status, 200);
     const data = await res.json();

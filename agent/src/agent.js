@@ -75,10 +75,6 @@ class LocalSentinelAgent {
         }
       }
     }, this.config.heartbeatIntervalMs);
-
-    if (this.reconnectTimer && typeof this.reconnectTimer.unref === 'function') {
-      this.reconnectTimer.unref();
-    }
   }
 
   /**

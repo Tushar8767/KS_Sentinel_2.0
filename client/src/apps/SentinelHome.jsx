@@ -32,15 +32,31 @@ Authorized Capabilities`}
         <h3 className="app-subheading">Module Status</h3>
         <div className="app-status-grid">
           <div className="app-status-row">
-            <span className="app-status-label">Module 0</span>
+            <span className="app-status-label">Module 0 — Architecture Foundation</span>
             <span className="app-status-value app-status-locked">LOCKED</span>
           </div>
           <div className="app-status-row">
-            <span className="app-status-label">Module 1</span>
+            <span className="app-status-label">Module 1 — Web OS Shell</span>
             <span className="app-status-value app-status-active">ACTIVE</span>
           </div>
           <div className="app-status-row">
-            <span className="app-status-label">Modules 2–27</span>
+            <span className="app-status-label">Module 2 — Dashboard</span>
+            <span className="app-status-value app-status-active">ACTIVE</span>
+          </div>
+          <div className="app-status-row">
+            <span className="app-status-label">Module 3 — Local Sentinel Agent</span>
+            <span className="app-status-value app-status-active">ACTIVE</span>
+          </div>
+          <div className="app-status-row">
+            <span className="app-status-label">Module 4 — Remote Machine Information</span>
+            <span className="app-status-value app-status-active">ACTIVE</span>
+          </div>
+          <div className="app-status-row">
+            <span className="app-status-label">Module 5 — Sentinel Workspace</span>
+            <span className="app-status-value app-status-active">ACTIVE</span>
+          </div>
+          <div className="app-status-row">
+            <span className="app-status-label">Modules 6–27</span>
             <span className="app-status-value app-status-pending">PENDING</span>
           </div>
         </div>
