@@ -10,6 +10,7 @@ const { AgentLifecycle, LifecycleState } = require('./lifecycle');
 const { CapabilityRegistry } = require('./capabilities');
 const { AgentHealth } = require('./health');
 const { GatewayClient } = require('./transport/gatewayClient');
+const { getMachineInfo } = require('./machine/machineInfo');
 const defaultConfig = require('./config');
 
 class LocalSentinelAgent {
@@ -23,7 +24,8 @@ class LocalSentinelAgent {
       this.identity,
       this.lifecycle,
       this.capabilities,
-      () => this.health.getUptimeSeconds()
+      () => this.health.getUptimeSeconds(),
+      () => getMachineInfo(this.identity)
     );
     this.health = new AgentHealth(this.identity, this.lifecycle, this.capabilities, this.transport);
     this.reconnectTimer = null;

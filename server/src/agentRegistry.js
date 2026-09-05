@@ -1,8 +1,9 @@
 /**
  * KS Sentinel 2.0 — Gateway Agent Registry
- * Module 3: Local Sentinel Agent
+ * Module 4: Remote Machine Information
  *
- * In-memory state tracking for connected local agent instances.
+ * In-memory state tracking for connected local agent instances
+ * and safe read-only machine telemetry caching.
  */
 
 // Stale timeout: if no heartbeat received within 15 seconds, mark agent offline
@@ -30,6 +31,7 @@ class GatewayAgentRegistry {
       arch: String(payload.arch || 'unknown'),
       nodeVersion: String(payload.nodeVersion || 'unknown'),
       capabilities: Array.isArray(payload.capabilities) ? payload.capabilities : [],
+      machineInfo: payload.machineInfo || null,
       registeredAt: new Date().toISOString(),
       lastSeen: Date.now(),
       state: 'CONNECTED'
@@ -58,6 +60,9 @@ class GatewayAgentRegistry {
     this.activeAgent.lastSeen = Date.now();
     this.activeAgent.state = payload.state === 'CONNECTED' ? 'CONNECTED' : payload.state || 'CONNECTED';
     this.activeAgent.uptimeSeconds = payload.uptimeSeconds || 0;
+    if (payload.machineInfo) {
+      this.activeAgent.machineInfo = payload.machineInfo;
+    }
 
     return {
       status: 'acknowledged',
@@ -114,6 +119,54 @@ class GatewayAgentRegistry {
       timestamp: new Date().toISOString()
     };
   }
+
+  /**
+   * Get safe, read-only remote machine information.
+   * Module 4: Remote Machine Information
+   */
+  getMachineInfo() {
+    if (!this.activeAgent) {
+      return {
+        available: false,
+        state: 'NOT_CONNECTED',
+        machine: null,
+        message: 'Machine information unavailable: Local Sentinel Agent is not connected.',
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    const isStale = (Date.now() - this.activeAgent.lastSeen) > HEARTBEAT_TIMEOUT_MS;
+    if (isStale || this.activeAgent.state === 'OFFLINE') {
+      return {
+        available: false,
+        state: 'OFFLINE',
+        machine: null,
+        message: 'Machine information unavailable: Local Sentinel Agent is offline.',
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    if (!this.activeAgent.machineInfo) {
+      return {
+        available: false,
+        state: this.activeAgent.state,
+        machine: null,
+        message: 'Machine information pending collection.',
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    return {
+      available: true,
+      state: 'CONNECTED',
+      agent: {
+        agentId: this.activeAgent.agentId,
+        agentVersion: this.activeAgent.agentVersion
+      },
+      ...this.activeAgent.machineInfo,
+      timestamp: new Date().toISOString()
+    };
+  }
 }
 
 const agentRegistry = new GatewayAgentRegistry();
@@ -122,4 +175,3 @@ module.exports = {
   agentRegistry,
   GatewayAgentRegistry
 };
-

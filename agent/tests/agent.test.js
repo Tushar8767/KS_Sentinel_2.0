@@ -55,10 +55,14 @@ test('Agent Lifecycle State Machine', () => {
   }, /Invalid lifecycle transition/);
 });
 
-test('Capability Registry (Module 3 Boundary)', () => {
+test('Capability Registry (Module 4 Boundary)', () => {
   const registry = new CapabilityRegistry();
-  assert.equal(registry.count, 0);
-  assert.deepEqual(registry.getCapabilityDescriptors(), []);
+  assert.equal(registry.count, 1);
+  assert.equal(registry.hasCapability('machine.info.read'), true);
+  const descriptors = registry.getCapabilityDescriptors();
+  assert.equal(descriptors.length, 1);
+  assert.equal(descriptors[0].id, 'machine.info.read');
+  assert.equal(descriptors[0].enabled, true);
 
   // Security assertion: verify no dangerous executor methods exist
   assert.equal(registry.execute, undefined);
@@ -77,7 +81,7 @@ test('Agent Health Report', () => {
   assert.equal(report.agentId, 'health_test_id');
   assert.equal(report.lifecycleState, LifecycleState.STARTING);
   assert.equal(typeof report.uptimeSeconds, 'number');
-  assert.equal(report.capabilitiesCount, 0);
+  assert.equal(report.capabilitiesCount, 1);
   assert.equal(report.connected, false);
 
   // Health vs Machine Telemetry boundary check

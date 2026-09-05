@@ -1,8 +1,9 @@
 /**
  * KS Sentinel 2.0 — Dashboard Application
  * Module 2: Dashboard
+ * Module 4: Remote Machine Information
  *
- * Operational overview and control console for KS Sentinel.
+ * Operational overview, architecture readiness, and read-only host machine telemetry.
  * Runs as a registered Web OS application inside the Window Manager.
  */
 
@@ -12,17 +13,43 @@ import { appRegistry } from '../../registry/appRegistry';
 import { eventBus, EventTypes } from '../../events/eventBus';
 import './dashboard.css';
 
+function formatBytes(bytes) {
+  if (!bytes || isNaN(bytes)) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let i = 0;
+  let val = Number(bytes);
+  while (val >= 1024 && i < units.length - 1) {
+    val /= 1024;
+    i++;
+  }
+  return `${val.toFixed(1)} ${units[i]}`;
+}
+
+function formatUptime(seconds) {
+  if (!seconds || isNaN(seconds)) return '0m';
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const parts = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  parts.push(`${minutes}m`);
+  return parts.join(' ');
+}
+
 export default function Dashboard() {
   const { windows, activeWindowId, openApp, focusWindow } = useWindows();
   const [gatewayStatus, setGatewayStatus] = useState('checking');
   const [agentStatus, setAgentStatus] = useState({ connected: false, state: 'CHECKING', agent: null });
+  const [machineInfo, setMachineInfo] = useState(null);
   const [lastChecked, setLastChecked] = useState(null);
   const [events, setEvents] = useState([]);
 
-  // Check Gateway Health Endpoint
-  // Check Gateway Health & Agent Status Endpoints
+  // Check Gateway Health, Agent Status & Machine Telemetry Endpoints
   const checkGatewayHealth = useCallback(() => {
     setGatewayStatus('checking');
+
+    // 1. Gateway Health
     fetch('/api/health')
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error ${res.status}`);
@@ -37,7 +64,7 @@ export default function Dashboard() {
         setLastChecked(new Date().toLocaleTimeString());
       });
 
-    // Query real Agent connection state via Secure Gateway
+    // 2. Agent Connection Status (Module 3)
     fetch('/api/agent/status')
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error ${res.status}`);
@@ -49,11 +76,24 @@ export default function Dashboard() {
       .catch(() => {
         setAgentStatus({ connected: false, state: 'OFFLINE', agent: null });
       });
+
+    // 3. Remote Machine Telemetry (Module 4)
+    fetch('/api/machine/info')
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        setMachineInfo(data);
+      })
+      .catch(() => {
+        setMachineInfo({ available: false, state: 'OFFLINE', message: 'Gateway communication error.' });
+      });
   }, []);
 
   useEffect(() => {
     checkGatewayHealth();
-    // Periodically refresh agent status every 5 seconds
+    // Periodically refresh agent & machine status every 5 seconds
     const timer = setInterval(checkGatewayHealth, 5000);
     return () => clearInterval(timer);
   }, [checkGatewayHealth]);
@@ -83,7 +123,7 @@ export default function Dashboard() {
             </span>
           </div>
           <span className="dashboard-subtitle">
-            KS Sentinel Virtual Operating Environment • Baseline: Module 2
+            KS Sentinel Virtual Operating Environment • Baseline: Module 4
           </span>
         </div>
         <div className="dashboard-header-actions">
@@ -93,7 +133,7 @@ export default function Dashboard() {
             </span>
           )}
           <button className="dashboard-refresh-btn" onClick={checkGatewayHealth}>
-            ↻ Check Gateway
+            ↻ Refresh
           </button>
         </div>
       </div>
@@ -158,7 +198,115 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* 3. System Readiness Architecture Grid */}
+      {/* 3. Remote Machine Telemetry (Module 4: Read-Only) */}
+      <div className="dashboard-section">
+        <div className="dashboard-section-header">
+          <span className="dashboard-section-title">
+            <span>▤</span> Remote Machine Telemetry
+          </span>
+          <span className="dashboard-section-badge">
+            {machineInfo?.available ? 'Live Host Telemetry (Read-Only)' : 'Telemetry Unavailable'}
+          </span>
+        </div>
+
+        {machineInfo?.available ? (
+          <div className="telemetry-grid">
+            {/* Host Identity Card */}
+            <div className="telemetry-card">
+              <div className="telemetry-card-title">
+                <span>HOST SYSTEM</span>
+                <span className="telemetry-card-badge">{machineInfo.machine?.platform} ({machineInfo.machine?.architecture})</span>
+              </div>
+              <div className="telemetry-item-row">
+                <span>Device</span>
+                <span className="telemetry-item-value">{machineInfo.machine?.hostname}</span>
+              </div>
+              <div className="telemetry-item-row">
+                <span>OS</span>
+                <span className="telemetry-item-value">{machineInfo.machine?.osRelease || machineInfo.machine?.osType}</span>
+              </div>
+              <div className="telemetry-item-row">
+                <span>Uptime</span>
+                <span className="telemetry-item-value">{formatUptime(machineInfo.machine?.uptimeSeconds)}</span>
+              </div>
+            </div>
+
+            {/* CPU Card */}
+            <div className="telemetry-card">
+              <div className="telemetry-card-title">
+                <span>PROCESSOR (CPU)</span>
+                <span className="telemetry-card-badge">{machineInfo.cpu?.cores} Cores</span>
+              </div>
+              <div className="telemetry-item-row">
+                <span>Model</span>
+                <span className="telemetry-item-value" style={{ fontSize: '9px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {machineInfo.cpu?.model}
+                </span>
+              </div>
+              <div className="telemetry-item-row">
+                <span>Speed</span>
+                <span className="telemetry-item-value">{machineInfo.cpu?.speedMHz} MHz</span>
+              </div>
+            </div>
+
+            {/* Memory Card */}
+            <div className="telemetry-card">
+              <div className="telemetry-card-title">
+                <span>SYSTEM MEMORY</span>
+                <span className="telemetry-card-badge">{machineInfo.memory?.usagePercent}%</span>
+              </div>
+              <div className="telemetry-bar-track">
+                <div
+                  className="telemetry-bar-fill telemetry-bar-cyan"
+                  style={{ width: `${Math.min(100, Math.max(0, machineInfo.memory?.usagePercent || 0))}%` }}
+                />
+              </div>
+              <div className="telemetry-item-row">
+                <span>Used / Total</span>
+                <span className="telemetry-item-value">
+                  {formatBytes(machineInfo.memory?.usedBytes)} / {formatBytes(machineInfo.memory?.totalBytes)}
+                </span>
+              </div>
+            </div>
+
+            {/* Storage Card */}
+            {machineInfo.storage ? (
+              <div className="telemetry-card">
+                <div className="telemetry-card-title">
+                  <span>STORAGE ({machineInfo.storage.mount})</span>
+                  <span className="telemetry-card-badge">{machineInfo.storage.usagePercent}%</span>
+                </div>
+                <div className="telemetry-bar-track">
+                  <div
+                    className="telemetry-bar-fill telemetry-bar-green"
+                    style={{ width: `${Math.min(100, Math.max(0, machineInfo.storage.usagePercent || 0))}%` }}
+                  />
+                </div>
+                <div className="telemetry-item-row">
+                  <span>Free Space</span>
+                  <span className="telemetry-item-value">
+                    {formatBytes(machineInfo.storage.freeBytes)} / {formatBytes(machineInfo.storage.totalBytes)}
+                  </span>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <div className="telemetry-unavailable-banner">
+            <span className="telemetry-unavailable-icon">⚠</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <strong style={{ color: 'var(--text-main)', fontFamily: 'var(--font-mono)' }}>
+                Machine Telemetry Unavailable
+              </strong>
+              <span>
+                {machineInfo?.message || 'Local Sentinel Agent is not connected. Host machine information is offline.'}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 4. System Readiness Architecture Grid */}
       <div className="dashboard-section">
         <div className="dashboard-section-header">
           <span className="dashboard-section-title">
@@ -189,14 +337,12 @@ export default function Dashboard() {
           <div className="readiness-item">
             <div className="readiness-item-info">
               <span className="readiness-name">Local Sentinel Agent</span>
-              <span className="readiness-role">Windows Host Service (Mod 3)</span>
               <span className="readiness-role">
                 {agentStatus.agent
                   ? `${agentStatus.agent.platform} (${agentStatus.agent.arch})`
                   : 'Windows Host Service (Mod 3)'}
               </span>
             </div>
-            <span className="dashboard-badge dashboard-badge-pending">NOT CONNECTED</span>
             <span
               className={`dashboard-badge dashboard-badge-${
                 agentStatus.connected
@@ -234,14 +380,9 @@ export default function Dashboard() {
             <span className="dashboard-badge dashboard-badge-pending">PENDING</span>
           </div>
         </div>
-
-        <p style={{ fontSize: '10px', color: 'var(--text-muted)', lineHeight: '1.4', marginTop: '4px' }}>
-          * Architecture Note: Host machine metrics (CPU, Memory, Git, Filesystem) remain unavailable until the Local Sentinel Agent (Module 3) is connected.
-          Arbitrary command execution is strictly prohibited.
-        </p>
       </div>
 
-      {/* 4. Quick Application Access */}
+      {/* 5. Quick Application Access */}
       <div className="dashboard-section">
         <div className="dashboard-section-header">
           <span className="dashboard-section-title">
@@ -287,7 +428,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* 5. Shell Activity Stream */}
+      {/* 6. Shell Activity Stream */}
       <div className="dashboard-section">
         <div className="dashboard-section-header">
           <span className="dashboard-section-title">
@@ -341,4 +482,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

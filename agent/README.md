@@ -1,68 +1,56 @@
-# Local Sentinel Agent (Placeholder Baseline)
 # Local Sentinel Agent (KS Sentinel 2.0)
 
-**Module:** 0 — Architecture Foundation  
-**Target Module for Implementation:** Module 3 — Local Sentinel Agent  
-**Module:** 3 — Local Sentinel Agent  
+**Module:** 3 — Local Sentinel Agent & Module 4 — Remote Machine Information  
 **Status:** ACTIVE BASELINE  
 
 ---
 
-## Purpose
 ## 1. Overview
 
-The **Local Sentinel Agent** is a Windows host background application/service responsible for communicating securely with the Server Gateway and executing authorized host capabilities.
-The **Local Sentinel Agent** is the local Windows-side background process responsible for securely communicating with the KS Sentinel Server Gateway. It provides a stable identity, explicit lifecycle management, health monitoring, and the foundation for future capability brokering.
+The **Local Sentinel Agent** is the local Windows-side background process responsible for securely communicating with the KS Sentinel Server Gateway. It provides a stable identity, explicit lifecycle management, health monitoring, capability discovery, and read-only host machine telemetry.
 
 ```text
 KS Sentinel Web OS (Browser)
         ↓ HTTP / Proxy
 Secure Server Gateway (Express on port 5000)
     GET  /api/agent/status
+    GET  /api/machine/info       <-- Module 4: Read-Only Host Telemetry
     POST /api/agent/register
     POST /api/agent/heartbeat
     POST /api/agent/disconnect
         ↑ Safe Loopback / TLS Communication
 Local Sentinel Agent (Windows host process)
-        ↓ (Future Modules: Validated Capability Hooks)
-Authorized Machine Capabilities
+    ├── Identity (agentId, platform, nodeVersion)
+    ├── Lifecycle (STARTING -> READY -> CONNECTING -> CONNECTED -> STOPPING -> STOPPED)
+    ├── Capability Registry (machine.info.read)
+    └── Machine Info Provider (CPU, Memory, Storage, Host, Network)
 ```
 
 ---
 
-## Architectural Role
-## 2. Module 3 Scope: What the Agent Does
+## 2. Capabilities
 
-```text
-Server Gateway
-      ↓ (Encrypted Capability Messages)
-Local Sentinel Agent
-      ↓ (Host APIs / Native Commands)
-Windows Host Machine Resources
-```
-1. **Process & Identity Management:** Provides a stable agent identifier (`agentId`, `agentVersion`, `protocolVersion`, `platform`, `nodeVersion`).
-2. **Explicit Lifecycle States:**
-   $$\text{STARTING} \rightarrow \text{READY} \rightarrow \text{CONNECTING} \rightarrow \text{CONNECTED} \rightarrow \text{STOPPING} \rightarrow \text{STOPPED}$$
-3. **Secure Gateway Communication:**
-   - **Handshake / Registration:** Registers identity with the Gateway via `POST /api/agent/register`.
-   - **Heartbeat:** Periodically confirms liveness via `POST /api/agent/heartbeat`.
-   - **Clean Disconnect:** Notifies the Gateway of planned shutdowns via `POST /api/agent/disconnect`.
-4. **Health Reporting:** Exposes agent process health (`status`, `uptimeSeconds`, `lifecycleState`, `connected`, `capabilitiesCount`).
-5. **Capability Discovery Foundation:** Establishes the capability catalog interface. In Module 3, the capability catalog contains zero executable hooks.
+### `machine.info.read` (Module 4)
+- **ID:** `machine.info.read`
+- **Type:** Read-Only
+- **Scope:** Collects safe host hardware & OS metadata:
+  - Hostname, OS platform, architecture, release, uptime
+  - CPU model, core/thread count, clock speed
+  - System memory total, free, used, usage percentage
+  - Storage drive total, free, used, usage percentage (via `fs.statfsSync`)
+  - Active non-internal IPv4 interfaces
+- **Security:** Pure Node.js C-library calls (`os`, `fs.statfsSync`). Zero shell invocations, zero subprocesses.
 
 ---
 
-## Security Restrictions
-## 3. Strict Security Boundary: What the Agent Intentionally Does NOT Do
+## 3. Strict Security Boundary
 
-- No arbitrary shell string execution.
-- No direct client-to-agent connection bypassing Gateway security token checks.
-- Sandboxed to explicit user-authorized paths and capability hooks.
 In strict adherence to the KS Sentinel Security Boundary:
 - ❌ **No Arbitrary Shell Execution:** No `exec()`, `spawn()`, PowerShell, or cmd.exe execution.
+- ❌ **No Shell Telemetry Tools:** No `wmic`, `powershell`, `cmd`, `systeminfo`, `netstat`, or `ipconfig`.
 - ❌ **No Direct Browser Access:** The browser never communicates directly with the Local Agent; all interaction is mediated by the Gateway.
-- ❌ **No Machine Telemetry:** Host metrics (CPU, RAM, storage, process lists) are not collected in Module 3 (belong to Module 4).
-- ❌ **No Filesystem Manipulation:** No arbitrary file reading or writing.
+- ❌ **No Filesystem Browsing:** No arbitrary directory traversal or file reading/writing.
+- ❌ **No Process Control:** No process inspection or termination.
 - ❌ **No Trust/Policy Bypass:** The Agent does not grant authority or make authorization decisions.
 
 ---

@@ -1,23 +1,24 @@
 /**
  * KS Sentinel 2.0 — Local Sentinel Agent Gateway Transport Client
- * Module 3: Local Sentinel Agent
+ * Module 4: Remote Machine Information
  *
  * Handles HTTP/TLS transport communication between Local Agent and Server Gateway:
- * - Registration / Handshake (POST /api/agent/register)
- * - Periodic Heartbeat (POST /api/agent/heartbeat)
+ * - Registration / Handshake (POST /api/agent/register) with capabilities & initial machine info
+ * - Periodic Heartbeat (POST /api/agent/heartbeat) with liveness & telemetry payload
  * - Clean Disconnect Notification (POST /api/agent/disconnect)
  */
 
 const { LifecycleState } = require('../lifecycle');
 
 class GatewayClient {
-  constructor(config, identity, lifecycle, capabilities, getUptimeFn) {
+  constructor(config, identity, lifecycle, capabilities, getUptimeFn, getMachineInfoFn = null) {
     this.gatewayUrl = config.gatewayUrl.replace(/\/+$/, '');
     this.heartbeatIntervalMs = config.heartbeatIntervalMs;
     this.identity = identity;
     this.lifecycle = lifecycle;
     this.capabilities = capabilities;
     this.getUptimeFn = getUptimeFn;
+    this.getMachineInfoFn = getMachineInfoFn;
 
     this.heartbeatTimer = null;
     this.connected = false;
@@ -40,6 +41,7 @@ class GatewayClient {
     const payload = {
       ...this.identity.toJSON(),
       capabilities: this.capabilities.getCapabilityDescriptors(),
+      machineInfo: this.getMachineInfoFn ? this.getMachineInfoFn() : null,
       timestamp: new Date().toISOString()
     };
 
@@ -101,7 +103,7 @@ class GatewayClient {
   }
 
   /**
-   * Send a single heartbeat to the gateway.
+   * Send a single heartbeat to the gateway, including current machine info.
    */
   async sendHeartbeat() {
     if (this.lifecycle.isStoppingOrStopped()) return;
@@ -111,6 +113,7 @@ class GatewayClient {
       agentId: this.identity.agentId,
       state: this.lifecycle.state,
       uptimeSeconds: this.getUptimeFn ? this.getUptimeFn() : 0,
+      machineInfo: this.getMachineInfoFn ? this.getMachineInfoFn() : null,
       timestamp: new Date().toISOString()
     };
 
@@ -170,4 +173,3 @@ class GatewayClient {
 module.exports = {
   GatewayClient
 };
-

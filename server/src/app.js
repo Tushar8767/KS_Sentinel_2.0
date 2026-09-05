@@ -32,6 +32,14 @@ app.get('/api/agent/status', (req, res) => {
   res.status(200).json(status);
 });
 
+// --- Remote Machine Information (Module 4) ---
+
+// Safe Read-Only Machine Telemetry (Consumed by Dashboard / Web OS)
+app.get('/api/machine/info', (req, res) => {
+  const machineInfo = agentRegistry.getMachineInfo();
+  res.status(200).json(machineInfo);
+});
+
 // Agent Handshake / Registration (Called by Local Sentinel Agent)
 app.post('/api/agent/register', (req, res) => {
   try {
