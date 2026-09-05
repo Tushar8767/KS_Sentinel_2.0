@@ -7,11 +7,23 @@
  * The Window Manager and Dock read from this registry — no hardcoded app logic.
  */
 
+import Dashboard from '../apps/dashboard/Dashboard';
 import SentinelHome from '../apps/SentinelHome';
 import SystemOverview from '../apps/SystemOverview';
 import DemoApp from '../apps/DemoApp';
 
 export const appRegistry = [
+  {
+    id: 'dashboard',
+    name: 'Dashboard',
+    icon: '⊞',
+    component: Dashboard,
+    defaultWidth: 840,
+    defaultHeight: 580,
+    minWidth: 480,
+    minHeight: 360,
+    description: 'Operational overview and control console for KS Sentinel',
+  },
   {
     id: 'sentinel-home',
     name: 'Sentinel Home',
