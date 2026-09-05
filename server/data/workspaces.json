@@ -1,0 +1,25 @@
+{
+  "version": "1.0.0",
+  "activeWorkspaceId": "ws_default_01",
+  "updatedAt": "2026-09-05T16:21:02.054Z",
+  "workspaces": [
+    {
+      "id": "ws_default_01",
+      "name": "Default Workspace",
+      "description": "Default primary environment for KS Sentinel",
+      "status": "ACTIVE",
+      "rootPath": "D:\\.vscode\\Coding\\Projects\\antigravity\\KS_Sentinel_2.0",
+      "agentId": "sentinel-local-agent-01",
+      "metadata": {
+        "color": "#00e5ff",
+        "tags": [
+          "default",
+          "core"
+        ]
+      },
+      "createdAt": "2026-09-05T16:13:35.530Z",
+      "updatedAt": "2026-09-05T16:21:02.054Z",
+      "lastOpenedAt": "2026-09-05T16:13:35.530Z"
+    }
+  ]
+}

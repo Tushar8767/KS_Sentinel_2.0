@@ -42,10 +42,11 @@ export default function Dashboard() {
   const [gatewayStatus, setGatewayStatus] = useState('checking');
   const [agentStatus, setAgentStatus] = useState({ connected: false, state: 'CHECKING', agent: null });
   const [machineInfo, setMachineInfo] = useState(null);
+  const [activeWorkspace, setActiveWorkspace] = useState(null);
   const [lastChecked, setLastChecked] = useState(null);
   const [events, setEvents] = useState([]);
 
-  // Check Gateway Health, Agent Status & Machine Telemetry Endpoints
+  // Check Gateway Health, Agent Status, Machine Telemetry & Active Workspace Endpoints
   const checkGatewayHealth = useCallback(() => {
     setGatewayStatus('checking');
 
@@ -89,6 +90,18 @@ export default function Dashboard() {
       .catch(() => {
         setMachineInfo({ available: false, state: 'OFFLINE', message: 'Gateway communication error.' });
       });
+
+    // 4. Active Workspace (Module 5)
+    fetch('/api/workspaces/active')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.active && data.workspace) {
+          setActiveWorkspace(data.workspace);
+        } else {
+          setActiveWorkspace(null);
+        }
+      })
+      .catch(() => setActiveWorkspace(null));
   }, []);
 
   useEffect(() => {
@@ -194,6 +207,34 @@ export default function Dashboard() {
             {agentStatus.agent
               ? `${agentStatus.agent.agentId} (v${agentStatus.agent.agentVersion})`
               : 'Host Telemetry Offline'}
+          </span>
+        </div>
+
+        <div
+          className="dashboard-metric-card"
+          onClick={() => openApp('workspace-manager')}
+          style={{ cursor: 'pointer' }}
+          title="Click to open Workspace Manager"
+        >
+          <span className="dashboard-metric-label">Active Workspace</span>
+          <span
+            className="dashboard-metric-value"
+            style={{
+              fontSize: '13px',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              color: activeWorkspace ? 'var(--accent-cyan)' : 'var(--text-muted)'
+            }}
+          >
+            {activeWorkspace ? activeWorkspace.name : 'None'}
+          </span>
+          <span className="dashboard-metric-detail">
+            {activeWorkspace
+              ? activeWorkspace.rootPath
+                ? `Bound: ${activeWorkspace.rootPath.split('\\').pop() || activeWorkspace.rootPath}`
+                : 'Unbound Root'
+              : 'Click to Select'}
           </span>
         </div>
       </div>
@@ -358,6 +399,20 @@ export default function Dashboard() {
 
           <div className="readiness-item">
             <div className="readiness-item-info">
+              <span className="readiness-name">Sentinel Workspace</span>
+              <span className="readiness-role">Logical Root Binding (Mod 5)</span>
+            </div>
+            <span
+              className={`dashboard-badge dashboard-badge-${
+                activeWorkspace ? 'online' : 'pending'
+              }`}
+            >
+              {activeWorkspace ? 'ONLINE' : 'PENDING'}
+            </span>
+          </div>
+
+          <div className="readiness-item">
+            <div className="readiness-item-info">
               <span className="readiness-name">Trust & Policy Engine</span>
               <span className="readiness-role">Access Authorization (Mod 21)</span>
             </div>
@@ -454,12 +509,13 @@ export default function Dashboard() {
           ) : (
             events.map((evt, idx) => {
               let rowClass = 'activity-row';
-              if (evt.type === EventTypes.APP_OPENED) rowClass += ' activity-row-opened';
-              else if (evt.type === EventTypes.APP_CLOSED) rowClass += ' activity-row-closed';
+              if (evt.type === EventTypes.APP_OPENED || evt.type === EventTypes.WORKSPACE_CREATED || evt.type === EventTypes.WORKSPACE_SWITCHED) rowClass += ' activity-row-opened';
+              else if (evt.type === EventTypes.APP_CLOSED || evt.type === EventTypes.WORKSPACE_CLOSED || evt.type === EventTypes.WORKSPACE_DELETED) rowClass += ' activity-row-closed';
               else if (evt.type === EventTypes.WINDOW_FOCUSED) rowClass += ' activity-row-focused';
               else if (evt.type === EventTypes.WINDOW_MINIMIZED) rowClass += ' activity-row-minimized';
 
               const detail =
+                evt.payload?.name ||
                 evt.payload?.title ||
                 evt.payload?.appId ||
                 evt.payload?.command ||

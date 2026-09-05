@@ -11,8 +11,20 @@ import Dashboard from '../apps/dashboard/Dashboard';
 import SentinelHome from '../apps/SentinelHome';
 import SystemOverview from '../apps/SystemOverview';
 import DemoApp from '../apps/DemoApp';
+import WorkspaceManager from '../apps/workspace/WorkspaceManager';
 
 export const appRegistry = [
+  {
+    id: 'workspace-manager',
+    name: 'Workspaces',
+    icon: '⧉',
+    component: WorkspaceManager,
+    defaultWidth: 800,
+    defaultHeight: 540,
+    minWidth: 520,
+    minHeight: 380,
+    description: 'Sentinel Workspace management, local host root binding, and agent association',
+  },
   {
     id: 'dashboard',
     name: 'Dashboard',

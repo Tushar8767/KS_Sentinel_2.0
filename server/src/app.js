@@ -76,6 +76,115 @@ app.post('/api/agent/disconnect', (req, res) => {
   res.status(200).json(result);
 });
 
+// --- Sentinel Workspace Management (Module 5) ---
+const { workspaceStore } = require('./workspaceStore');
+workspaceStore.setAgentRegistry(agentRegistry);
+
+// List All Workspaces
+app.get('/api/workspaces', (req, res) => {
+  const list = workspaceStore.listWorkspaces();
+  res.status(200).json(list);
+});
+
+// Get Active Workspace
+app.get('/api/workspaces/active', (req, res) => {
+  const active = workspaceStore.getActiveWorkspace();
+  if (!active) {
+    return res.status(200).json({ active: false, workspace: null });
+  }
+  res.status(200).json({ active: true, workspace: active });
+});
+
+// Create Workspace
+app.post('/api/workspaces', (req, res) => {
+  try {
+    const ws = workspaceStore.createWorkspace(req.body || {});
+    res.status(201).json(ws);
+  } catch (err) {
+    res.status(400).json({
+      error: 'Workspace Creation Failed',
+      message: err.message
+    });
+  }
+});
+
+// Get Workspace by ID
+app.get('/api/workspaces/:id', (req, res) => {
+  const ws = workspaceStore.getWorkspace(req.params.id);
+  if (!ws) {
+    return res.status(404).json({
+      error: 'Workspace Not Found',
+      message: `No workspace exists with id: ${req.params.id}`
+    });
+  }
+  res.status(200).json(ws);
+});
+
+// Open / Activate Workspace
+app.post('/api/workspaces/:id/open', (req, res) => {
+  try {
+    const ws = workspaceStore.openWorkspace(req.params.id);
+    res.status(200).json(ws);
+  } catch (err) {
+    res.status(404).json({
+      error: 'Cannot Open Workspace',
+      message: err.message
+    });
+  }
+});
+
+// Alternate alias for activate
+app.post('/api/workspaces/:id/activate', (req, res) => {
+  try {
+    const ws = workspaceStore.switchWorkspace(req.params.id);
+    res.status(200).json(ws);
+  } catch (err) {
+    res.status(404).json({
+      error: 'Cannot Activate Workspace',
+      message: err.message
+    });
+  }
+});
+
+// Close Workspace
+app.post('/api/workspaces/:id/close', (req, res) => {
+  try {
+    const ws = workspaceStore.closeWorkspace(req.params.id);
+    res.status(200).json(ws);
+  } catch (err) {
+    res.status(404).json({
+      error: 'Cannot Close Workspace',
+      message: err.message
+    });
+  }
+});
+
+// Update Workspace Metadata
+app.patch('/api/workspaces/:id', (req, res) => {
+  try {
+    const ws = workspaceStore.updateWorkspace(req.params.id, req.body || {});
+    res.status(200).json(ws);
+  } catch (err) {
+    res.status(400).json({
+      error: 'Workspace Update Failed',
+      message: err.message
+    });
+  }
+});
+
+// Delete Workspace
+app.delete('/api/workspaces/:id', (req, res) => {
+  try {
+    const result = workspaceStore.deleteWorkspace(req.params.id);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({
+      error: 'Workspace Deletion Failed',
+      message: err.message
+    });
+  }
+});
+
 // 404 Handler
 app.use((req, res) => {
   res.status(404).json({
