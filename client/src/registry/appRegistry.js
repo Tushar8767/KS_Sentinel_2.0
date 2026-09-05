@@ -12,6 +12,7 @@ import SentinelHome from '../apps/SentinelHome';
 import SystemOverview from '../apps/SystemOverview';
 import DemoApp from '../apps/DemoApp';
 import WorkspaceManager from '../apps/workspace/WorkspaceManager';
+import ProjectManager from '../apps/projects/ProjectManager';
 
 export const appRegistry = [
   {
@@ -24,6 +25,17 @@ export const appRegistry = [
     minWidth: 520,
     minHeight: 380,
     description: 'Sentinel Workspace management, local host root binding, and agent association',
+  },
+  {
+    id: 'project-manager',
+    name: 'Projects',
+    icon: '◲',
+    component: ProjectManager,
+    defaultWidth: 800,
+    defaultHeight: 540,
+    minWidth: 500,
+    minHeight: 360,
+    description: 'Sentinel Project lifecycle, workspace development units, and logical host bindings',
   },
   {
     id: 'dashboard',

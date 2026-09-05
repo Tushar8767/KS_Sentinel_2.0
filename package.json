@@ -17,7 +17,8 @@
     "build": "npm --prefix client run build",
     "build:client": "npm --prefix client run build",
     "build:server": "node --check server/src/index.js",
-    "test": "node --test tests/server/*.test.js agent/tests/*.test.js"
+    "test": "node --test tests/server/*.test.js agent/tests/*.test.js",
+    "git:repair": "node scripts/repair-index.js"
   },
   "keywords": [
     "virtual-os",

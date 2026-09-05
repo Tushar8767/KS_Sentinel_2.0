@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "activeWorkspaceId": "ws_default_01",
-  "updatedAt": "2026-09-05T19:08:36.516Z",
+  "updatedAt": "2026-09-05T20:12:59.817Z",
   "workspaces": [
     {
       "id": "ws_default_01",
@@ -18,23 +18,8 @@
         ]
       },
       "createdAt": "2026-09-05T16:13:35.530Z",
-      "updatedAt": "2026-09-05T19:08:36.515Z",
-      "lastOpenedAt": "2026-09-05T19:08:36.515Z"
-    },
-    {
-      "id": "ws_218ed8c171a9",
-      "name": "Live E2E Verification WS",
-      "description": "",
-      "status": "INACTIVE",
-      "rootPath": "D:\\\\projects\\\\test",
-      "agentId": "sentinel-local-agent-01",
-      "metadata": {
-        "color": "#00e5ff",
-        "tags": []
-      },
-      "createdAt": "2026-09-05T19:00:04.828Z",
-      "updatedAt": "2026-09-05T19:00:04.828Z",
-      "lastOpenedAt": null
+      "updatedAt": "2026-09-05T20:12:59.816Z",
+      "lastOpenedAt": "2026-09-05T20:12:59.816Z"
     }
   ]
 }

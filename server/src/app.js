@@ -185,6 +185,118 @@ app.delete('/api/workspaces/:id', (req, res) => {
   }
 });
 
+// --- Sentinel Projects Management (Module 6) ---
+const { projectStore } = require('./projectStore');
+projectStore.setWorkspaceStore(workspaceStore);
+workspaceStore.setProjectStore(projectStore);
+
+// List Projects (Scoped to workspace)
+app.get('/api/projects', (req, res) => {
+  const wsId = req.query.workspaceId || null;
+  const list = projectStore.listProjects(wsId);
+  res.status(200).json(list);
+});
+
+// Get Active Project
+app.get('/api/projects/active', (req, res) => {
+  const wsId = req.query.workspaceId || null;
+  const active = projectStore.getActiveProject(wsId);
+  if (!active) {
+    return res.status(200).json({ active: false, project: null });
+  }
+  res.status(200).json({ active: true, project: active });
+});
+
+// Create Project
+app.post('/api/projects', (req, res) => {
+  try {
+    const proj = projectStore.createProject(req.body || {});
+    res.status(201).json(proj);
+  } catch (err) {
+    res.status(400).json({
+      error: 'Project Creation Failed',
+      message: err.message
+    });
+  }
+});
+
+// Get Project by ID
+app.get('/api/projects/:id', (req, res) => {
+  const proj = projectStore.getProject(req.params.id);
+  if (!proj) {
+    return res.status(404).json({
+      error: 'Project Not Found',
+      message: `No project exists with id: ${req.params.id}`
+    });
+  }
+  res.status(200).json(proj);
+});
+
+// Open / Activate Project
+app.post('/api/projects/:id/open', (req, res) => {
+  try {
+    const proj = projectStore.openProject(req.params.id);
+    res.status(200).json(proj);
+  } catch (err) {
+    res.status(404).json({
+      error: 'Cannot Open Project',
+      message: err.message
+    });
+  }
+});
+
+// Alternate alias for activate
+app.post('/api/projects/:id/activate', (req, res) => {
+  try {
+    const proj = projectStore.switchProject(req.params.id);
+    res.status(200).json(proj);
+  } catch (err) {
+    res.status(404).json({
+      error: 'Cannot Activate Project',
+      message: err.message
+    });
+  }
+});
+
+// Close Project
+app.post('/api/projects/:id/close', (req, res) => {
+  try {
+    const proj = projectStore.closeProject(req.params.id);
+    res.status(200).json(proj);
+  } catch (err) {
+    res.status(404).json({
+      error: 'Cannot Close Project',
+      message: err.message
+    });
+  }
+});
+
+// Update Project Metadata
+app.patch('/api/projects/:id', (req, res) => {
+  try {
+    const proj = projectStore.updateProject(req.params.id, req.body || {});
+    res.status(200).json(proj);
+  } catch (err) {
+    res.status(400).json({
+      error: 'Project Update Failed',
+      message: err.message
+    });
+  }
+});
+
+// Delete Project
+app.delete('/api/projects/:id', (req, res) => {
+  try {
+    const result = projectStore.deleteProject(req.params.id);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({
+      error: 'Project Deletion Failed',
+      message: err.message
+    });
+  }
+});
+
 // 404 Handler
 app.use((req, res) => {
   res.status(404).json({

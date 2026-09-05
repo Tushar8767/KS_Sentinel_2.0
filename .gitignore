@@ -41,4 +41,6 @@ coverage/
 Thumbs.db
 tmp/
 scratch/
+*.tmp
+*.tmp.*
 

@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-09-05T20:13:10.164Z",
+  "activeProjects": {},
+  "projects": [
+    {
+      "id": "proj_default_01",
+      "workspaceId": "ws_default_01",
+      "name": "KS Sentinel Core",
+      "description": "Primary KS Sentinel 2.0 system development project",
+      "status": "INACTIVE",
+      "rootPath": "D:\\.vscode\\Coding\\Projects\\antigravity\\KS_Sentinel_2.0",
+      "metadata": {
+        "color": "#7c4dff",
+        "tags": [
+          "sentinel",
+          "core"
+        ],
+        "type": "system"
+      },
+      "createdAt": "2026-09-05T19:54:46.885Z",
+      "updatedAt": "2026-09-05T20:13:10.146Z",
+      "lastOpenedAt": "2026-09-05T20:12:59.822Z"
+    }
+  ]
+}

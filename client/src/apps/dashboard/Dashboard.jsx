@@ -43,10 +43,11 @@ export default function Dashboard() {
   const [agentStatus, setAgentStatus] = useState({ connected: false, state: 'CHECKING', agent: null });
   const [machineInfo, setMachineInfo] = useState(null);
   const [activeWorkspace, setActiveWorkspace] = useState(null);
+  const [activeProject, setActiveProject] = useState(null);
   const [lastChecked, setLastChecked] = useState(null);
   const [events, setEvents] = useState([]);
 
-  // Check Gateway Health, Agent Status, Machine Telemetry & Active Workspace Endpoints
+  // Check Gateway Health, Agent Status, Machine Telemetry, Active Workspace & Project
   const checkGatewayHealth = useCallback(() => {
     setGatewayStatus('checking');
 
@@ -102,6 +103,18 @@ export default function Dashboard() {
         }
       })
       .catch(() => setActiveWorkspace(null));
+
+    // 5. Active Project (Module 6)
+    fetch('/api/projects/active')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.active && data.project) {
+          setActiveProject(data.project);
+        } else {
+          setActiveProject(null);
+        }
+      })
+      .catch(() => setActiveProject(null));
   }, []);
 
   useEffect(() => {
@@ -136,7 +149,7 @@ export default function Dashboard() {
             </span>
           </div>
           <span className="dashboard-subtitle">
-            KS Sentinel Virtual Operating Environment • Baseline: Module 4
+            KS Sentinel Virtual Operating Environment • Baseline: Module 6
           </span>
         </div>
         <div className="dashboard-header-actions">
@@ -234,6 +247,34 @@ export default function Dashboard() {
               ? activeWorkspace.rootPath
                 ? `Bound: ${activeWorkspace.rootPath.split('\\').pop() || activeWorkspace.rootPath}`
                 : 'Unbound Root'
+              : 'Click to Select'}
+          </span>
+        </div>
+
+        <div
+          className="dashboard-metric-card"
+          onClick={() => openApp('project-manager')}
+          style={{ cursor: 'pointer' }}
+          title="Click to open Project Manager"
+        >
+          <span className="dashboard-metric-label">Active Project</span>
+          <span
+            className="dashboard-metric-value"
+            style={{
+              fontSize: '13px',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              color: activeProject ? 'var(--accent-purple)' : 'var(--text-muted)'
+            }}
+          >
+            {activeProject ? activeProject.name : 'None'}
+          </span>
+          <span className="dashboard-metric-detail">
+            {activeProject
+              ? activeProject.rootPath
+                ? `Sub-path: ${activeProject.rootPath.split('\\').pop() || activeProject.rootPath}`
+                : 'Unbound Sub-path'
               : 'Click to Select'}
           </span>
         </div>
@@ -413,6 +454,20 @@ export default function Dashboard() {
 
           <div className="readiness-item">
             <div className="readiness-item-info">
+              <span className="readiness-name">Sentinel Projects</span>
+              <span className="readiness-role">Logical Work Unit (Mod 6)</span>
+            </div>
+            <span
+              className={`dashboard-badge dashboard-badge-${
+                activeProject ? 'online' : 'pending'
+              }`}
+            >
+              {activeProject ? 'ONLINE' : 'PENDING'}
+            </span>
+          </div>
+
+          <div className="readiness-item">
+            <div className="readiness-item-info">
               <span className="readiness-name">Trust & Policy Engine</span>
               <span className="readiness-role">Access Authorization (Mod 21)</span>
             </div>
@@ -509,8 +564,21 @@ export default function Dashboard() {
           ) : (
             events.map((evt, idx) => {
               let rowClass = 'activity-row';
-              if (evt.type === EventTypes.APP_OPENED || evt.type === EventTypes.WORKSPACE_CREATED || evt.type === EventTypes.WORKSPACE_SWITCHED) rowClass += ' activity-row-opened';
-              else if (evt.type === EventTypes.APP_CLOSED || evt.type === EventTypes.WORKSPACE_CLOSED || evt.type === EventTypes.WORKSPACE_DELETED) rowClass += ' activity-row-closed';
+              if (
+                evt.type === EventTypes.APP_OPENED ||
+                evt.type === EventTypes.WORKSPACE_CREATED ||
+                evt.type === EventTypes.WORKSPACE_SWITCHED ||
+                evt.type === EventTypes.PROJECT_CREATED ||
+                evt.type === EventTypes.PROJECT_OPENED ||
+                evt.type === EventTypes.PROJECT_SWITCHED
+              ) rowClass += ' activity-row-opened';
+              else if (
+                evt.type === EventTypes.APP_CLOSED ||
+                evt.type === EventTypes.WORKSPACE_CLOSED ||
+                evt.type === EventTypes.WORKSPACE_DELETED ||
+                evt.type === EventTypes.PROJECT_CLOSED ||
+                evt.type === EventTypes.PROJECT_DELETED
+              ) rowClass += ' activity-row-closed';
               else if (evt.type === EventTypes.WINDOW_FOCUSED) rowClass += ' activity-row-focused';
               else if (evt.type === EventTypes.WINDOW_MINIMIZED) rowClass += ' activity-row-minimized';
 

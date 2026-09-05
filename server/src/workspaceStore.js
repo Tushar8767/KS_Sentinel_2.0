@@ -21,6 +21,7 @@ class WorkspaceStore {
   constructor(storagePath = DEFAULT_STORAGE_PATH, agentRegistry = null) {
     this.storagePath = storagePath;
     this.agentRegistry = agentRegistry;
+    this.projectStore = null;
     this.workspaces = new Map();
     this.activeWorkspaceId = null;
     this.init();
@@ -31,6 +32,13 @@ class WorkspaceStore {
    */
   setAgentRegistry(agentRegistry) {
     this.agentRegistry = agentRegistry;
+  }
+
+  /**
+   * Set project store reference for cascading operations.
+   */
+  setProjectStore(projectStore) {
+    this.projectStore = projectStore;
   }
 
   /**
@@ -99,7 +107,12 @@ class WorkspaceStore {
 
       const tmpPath = `${this.storagePath}.${crypto.randomBytes(4).toString('hex')}.tmp`;
       fs.writeFileSync(tmpPath, JSON.stringify(payload, null, 2), 'utf8');
-      fs.renameSync(tmpPath, this.storagePath);
+      try {
+        fs.renameSync(tmpPath, this.storagePath);
+      } catch (renameErr) {
+        fs.copyFileSync(tmpPath, this.storagePath);
+        try { fs.unlinkSync(tmpPath); } catch {}
+      }
     } catch (err) {
       console.error('[WORKSPACE STORE] Error saving to disk:', err.message);
     }
@@ -353,6 +366,15 @@ class WorkspaceStore {
     // If active workspace is deleted, clear active or fallback to first other workspace
     const wasActive = this.activeWorkspaceId === id;
     this.workspaces.delete(id);
+
+    // Cascade delete any projects belonging to this workspace
+    if (this.projectStore) {
+      try {
+        this.projectStore.deleteProjectsByWorkspace(id);
+      } catch (err) {
+        console.warn('[WORKSPACE STORE] Warning deleting associated projects:', err.message);
+      }
+    }
 
     if (wasActive) {
       const remaining = Array.from(this.workspaces.values());
