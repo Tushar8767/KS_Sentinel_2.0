@@ -22,6 +22,52 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+const { agentRegistry } = require('./agentRegistry');
+
+// --- Agent Communication Foundation (Module 3) ---
+
+// Get Agent Connection Status (Consumed by Dashboard / Web OS)
+app.get('/api/agent/status', (req, res) => {
+  const status = agentRegistry.getStatus();
+  res.status(200).json(status);
+});
+
+// Agent Handshake / Registration (Called by Local Sentinel Agent)
+app.post('/api/agent/register', (req, res) => {
+  try {
+    const result = agentRegistry.registerAgent(req.body);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({
+      error: 'Registration Failed',
+      message: err.message
+    });
+  }
+});
+
+// Agent Periodic Heartbeat
+app.post('/api/agent/heartbeat', (req, res) => {
+  try {
+    const result = agentRegistry.processHeartbeat(req.body);
+    if (result.status === 'unregistered') {
+      return res.status(404).json(result);
+    }
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({
+      error: 'Heartbeat Failed',
+      message: err.message
+    });
+  }
+});
+
+// Agent Disconnect Notification
+app.post('/api/agent/disconnect', (req, res) => {
+  const { agentId, reason } = req.body || {};
+  const result = agentRegistry.disconnectAgent(agentId, reason);
+  res.status(200).json(result);
+});
+
 // 404 Handler
 app.use((req, res) => {
   res.status(404).json({

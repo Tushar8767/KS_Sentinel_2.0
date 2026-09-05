@@ -15,10 +15,12 @@ import './dashboard.css';
 export default function Dashboard() {
   const { windows, activeWindowId, openApp, focusWindow } = useWindows();
   const [gatewayStatus, setGatewayStatus] = useState('checking');
+  const [agentStatus, setAgentStatus] = useState({ connected: false, state: 'CHECKING', agent: null });
   const [lastChecked, setLastChecked] = useState(null);
   const [events, setEvents] = useState([]);
 
   // Check Gateway Health Endpoint
+  // Check Gateway Health & Agent Status Endpoints
   const checkGatewayHealth = useCallback(() => {
     setGatewayStatus('checking');
     fetch('/api/health')
@@ -34,10 +36,26 @@ export default function Dashboard() {
         setGatewayStatus('offline');
         setLastChecked(new Date().toLocaleTimeString());
       });
+
+    // Query real Agent connection state via Secure Gateway
+    fetch('/api/agent/status')
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        setAgentStatus(data);
+      })
+      .catch(() => {
+        setAgentStatus({ connected: false, state: 'OFFLINE', agent: null });
+      });
   }, []);
 
   useEffect(() => {
     checkGatewayHealth();
+    // Periodically refresh agent status every 5 seconds
+    const timer = setInterval(checkGatewayHealth, 5000);
+    return () => clearInterval(timer);
   }, [checkGatewayHealth]);
 
   // Subscribe to Shell EventBus
@@ -121,8 +139,25 @@ export default function Dashboard() {
           <span className="dashboard-metric-label">Local Agent</span>
           <span className="dashboard-metric-value" style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
             Awaiting Mod 3
+          <span
+            className="dashboard-metric-value"
+            style={{
+              color: agentStatus.connected
+                ? 'var(--accent-green)'
+                : agentStatus.state === 'OFFLINE'
+                ? 'var(--accent-red)'
+                : 'var(--text-muted)',
+              fontSize: '13px'
+            }}
+          >
+            {agentStatus.state}
           </span>
           <span className="dashboard-metric-detail">Host Telemetry Offline</span>
+          <span className="dashboard-metric-detail">
+            {agentStatus.agent
+              ? `${agentStatus.agent.agentId} (v${agentStatus.agent.agentVersion})`
+              : 'Host Telemetry Offline'}
+          </span>
         </div>
       </div>
 
@@ -158,8 +193,24 @@ export default function Dashboard() {
             <div className="readiness-item-info">
               <span className="readiness-name">Local Sentinel Agent</span>
               <span className="readiness-role">Windows Host Service (Mod 3)</span>
+              <span className="readiness-role">
+                {agentStatus.agent
+                  ? `${agentStatus.agent.platform} (${agentStatus.agent.arch})`
+                  : 'Windows Host Service (Mod 3)'}
+              </span>
             </div>
             <span className="dashboard-badge dashboard-badge-pending">NOT CONNECTED</span>
+            <span
+              className={`dashboard-badge dashboard-badge-${
+                agentStatus.connected
+                  ? 'online'
+                  : agentStatus.state === 'OFFLINE'
+                  ? 'offline'
+                  : 'pending'
+              }`}
+            >
+              {agentStatus.state}
+            </span>
           </div>
 
           <div className="readiness-item">
