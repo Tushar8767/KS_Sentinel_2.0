@@ -5,16 +5,19 @@
   "description": "KS Sentinel 2.0 — Web-based Virtual Operating Environment",
   "workspaces": [
     "client",
-    "server"
+    "server",
+    "agent"
   ],
   "scripts": {
     "dev": "node scripts/start-dev.js",
     "dev:client": "npm --prefix client run dev",
     "dev:server": "npm --prefix server run dev",
+    "dev:agent": "npm --prefix agent run dev",
+    "agent": "npm --prefix agent start",
     "build": "npm --prefix client run build",
     "build:client": "npm --prefix client run build",
     "build:server": "node --check server/src/index.js",
-    "test": "node --test tests/server/health.test.js"
+    "test": "node --test tests/server/health.test.js tests/server/agent.test.js agent/tests/*.test.js"
   },
   "keywords": [
     "virtual-os",
@@ -25,4 +28,3 @@
   "author": "",
   "license": "ISC"
 }
-

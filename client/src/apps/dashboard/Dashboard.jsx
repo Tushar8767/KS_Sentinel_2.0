@@ -137,8 +137,6 @@ export default function Dashboard() {
 
         <div className="dashboard-metric-card">
           <span className="dashboard-metric-label">Local Agent</span>
-          <span className="dashboard-metric-value" style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
-            Awaiting Mod 3
           <span
             className="dashboard-metric-value"
             style={{
@@ -152,7 +150,6 @@ export default function Dashboard() {
           >
             {agentStatus.state}
           </span>
-          <span className="dashboard-metric-detail">Host Telemetry Offline</span>
           <span className="dashboard-metric-detail">
             {agentStatus.agent
               ? `${agentStatus.agent.agentId} (v${agentStatus.agent.agentVersion})`
