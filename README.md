@@ -2,6 +2,8 @@
 
 **KS Sentinel 2.0** is a web-based Virtual Operating Environment designed to provide secure, controlled remote access to authorized local-machine resources, development environments, system state, AI services, and cybersecurity capabilities.
 
+🔗 **[Live Demo](https://ks-sentinel-2-0.onrender.com/)** · **[GitHub Repository](https://github.com/Tushar8767/KS_Sentinel_2.0)**
+
 > [!IMPORTANT]
 > **Status:** Module 0 Baseline Established (Architecture Foundation)  
 > All security boundaries, repository structures, and governance documentation are locked.
