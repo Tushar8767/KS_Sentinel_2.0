@@ -61,6 +61,11 @@ Authorized Capabilities`}
           </div>
           <div className="app-status-row">
             <span className="app-status-label">Modules 7–27</span>
+            <span className="app-status-label">Module 7A — Read-Only File Manager</span>
+            <span className="app-status-value app-status-active">ACTIVE</span>
+          </div>
+          <div className="app-status-row">
+            <span className="app-status-label">Modules 7B–27</span>
             <span className="app-status-value app-status-pending">PENDING</span>
           </div>
         </div>

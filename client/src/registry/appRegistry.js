@@ -13,8 +13,20 @@ import SystemOverview from '../apps/SystemOverview';
 import DemoApp from '../apps/DemoApp';
 import WorkspaceManager from '../apps/workspace/WorkspaceManager';
 import ProjectManager from '../apps/projects/ProjectManager';
+import FileManager from '../apps/files/FileManager';
 
 export const appRegistry = [
+  {
+    id: 'file-manager',
+    name: 'File Manager',
+    icon: '📁',
+    component: FileManager,
+    defaultWidth: 880,
+    defaultHeight: 600,
+    minWidth: 640,
+    minHeight: 420,
+    description: 'Read-only sandboxed filesystem browser for authorized workspaces and projects',
+  },
   {
     id: 'workspace-manager',
     name: 'Workspaces',

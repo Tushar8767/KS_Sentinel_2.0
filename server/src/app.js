@@ -297,6 +297,67 @@ app.delete('/api/projects/:id', (req, res) => {
   }
 });
 
+// --- Read-Only Sandboxed File Manager (Module 7A) ---
+const { fileService } = require('./fileService');
+
+// Directory listing bounded to authorized workspace/project root
+app.get('/api/files/list', async (req, res) => {
+  try {
+    const { workspaceId, projectId, subPath } = req.query;
+    const result = await fileService.listDirectory({ workspaceId, projectId, subPath });
+    res.status(200).json(result);
+  } catch (err) {
+    const statusCode = err.status || (err.statusCode ? err.statusCode : 500);
+    res.status(statusCode).json({
+      error: 'File Listing Failed',
+      message: err.message,
+      code: statusCode
+    });
+  }
+});
+
+// File or directory metadata bounded to authorized root
+app.get('/api/files/stat', async (req, res) => {
+  try {
+    const { workspaceId, projectId, filePath, subPath } = req.query;
+    const result = await fileService.statPath({
+      workspaceId,
+      projectId,
+      filePath: filePath || subPath
+    });
+    res.status(200).json(result);
+  } catch (err) {
+    const statusCode = err.status || (err.statusCode ? err.statusCode : 500);
+    res.status(statusCode).json({
+      error: 'File Stat Failed',
+      message: err.message,
+      code: statusCode
+    });
+  }
+});
+
+// File content preview bounded to authorized root (text/code only, <= 2MB)
+app.get('/api/files/content', async (req, res) => {
+  try {
+    const { workspaceId, projectId, filePath } = req.query;
+    const maxBytes = req.query.maxBytes ? parseInt(req.query.maxBytes, 10) : undefined;
+    const result = await fileService.readFileContent({
+      workspaceId,
+      projectId,
+      filePath,
+      maxBytes
+    });
+    res.status(200).json(result);
+  } catch (err) {
+    const statusCode = err.status || (err.statusCode ? err.statusCode : 500);
+    res.status(statusCode).json({
+      error: 'File Content Read Failed',
+      message: err.message,
+      code: statusCode
+    });
+  }
+});
+
 // 404 Handler
 app.use((req, res) => {
   res.status(404).json({

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "activeWorkspaceId": "ws_default_01",
-  "updatedAt": "2026-09-05T20:12:59.817Z",
+  "updatedAt": "2026-09-20T06:38:56.820Z",
   "workspaces": [
     {
       "id": "ws_default_01",
@@ -18,8 +18,38 @@
         ]
       },
       "createdAt": "2026-09-05T16:13:35.530Z",
-      "updatedAt": "2026-09-05T20:12:59.816Z",
-      "lastOpenedAt": "2026-09-05T20:12:59.816Z"
+      "updatedAt": "2026-09-20T06:38:56.819Z",
+      "lastOpenedAt": "2026-09-20T06:38:56.819Z"
+    },
+    {
+      "id": "ws_216ffca4d024",
+      "name": "File Manager Test Workspace",
+      "description": "Test workspace for sandboxed file manager",
+      "status": "INACTIVE",
+      "rootPath": "C:\\Users\\Tushar\\AppData\\Local\\Temp\\ks-sentinel-gw-ws-q8TQ4c",
+      "agentId": null,
+      "metadata": {
+        "color": "#00e5ff",
+        "tags": []
+      },
+      "createdAt": "2026-09-20T06:37:50.953Z",
+      "updatedAt": "2026-09-20T06:37:50.953Z",
+      "lastOpenedAt": null
+    },
+    {
+      "id": "ws_aa1b05768cb1",
+      "name": "File Manager Test Workspace",
+      "description": "Test workspace for sandboxed file manager",
+      "status": "INACTIVE",
+      "rootPath": "C:\\Users\\Tushar\\AppData\\Local\\Temp\\ks-sentinel-gw-ws-YnZGyk",
+      "agentId": null,
+      "metadata": {
+        "color": "#00e5ff",
+        "tags": []
+      },
+      "createdAt": "2026-09-20T06:38:55.978Z",
+      "updatedAt": "2026-09-20T06:38:55.978Z",
+      "lastOpenedAt": null
     }
   ]
 }

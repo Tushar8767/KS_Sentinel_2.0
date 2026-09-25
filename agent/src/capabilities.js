@@ -12,8 +12,33 @@
  * execute(command), runShell(), or arbitrary OS process execution.
  */
 
+const FILE_CAPABILITIES = [
+  {
+    id: 'workspace.file.list',
+    name: 'Workspace File List',
+    version: '1.0.0',
+    description: 'Safe, read-only directory listing bounded strictly to authorized workspace/project rootPath',
+    enabled: true
+  },
+  {
+    id: 'workspace.file.stat',
+    name: 'Workspace File Stat',
+    version: '1.0.0',
+    description: 'Safe, read-only file/directory metadata inspection bounded to authorized rootPath',
+    enabled: true
+  },
+  {
+    id: 'workspace.file.read',
+    name: 'Workspace File Read',
+    version: '1.0.0',
+    description: 'Safe, read-only text file content preview bounded to authorized rootPath with 2MB size limit',
+    enabled: true
+  }
+];
+
 class CapabilityRegistry {
   constructor() {
+  constructor(options = {}) {
     this.capabilities = new Map();
 
     // Module 4 Explicit Capability: Safe, Read-Only Machine Information
@@ -24,6 +49,20 @@ class CapabilityRegistry {
       description: 'Safe, read-only host platform, OS, CPU, memory, storage, and uptime metadata',
       enabled: true
     });
+
+    if (options.includeFileCapabilities) {
+      this.registerFileCapabilities();
+    }
+  }
+
+  /**
+   * Register Module 7A read-only filesystem capabilities.
+   */
+  registerFileCapabilities() {
+    for (const cap of FILE_CAPABILITIES) {
+      this.registerCapability(cap);
+    }
+    return this;
   }
 
   /**
@@ -69,4 +108,6 @@ class CapabilityRegistry {
 
 module.exports = {
   CapabilityRegistry
+  CapabilityRegistry,
+  FILE_CAPABILITIES
 };

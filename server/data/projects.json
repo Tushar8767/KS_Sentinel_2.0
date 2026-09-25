@@ -1,14 +1,16 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-09-05T20:13:10.164Z",
-  "activeProjects": {},
+  "updatedAt": "2026-09-20T06:38:56.825Z",
+  "activeProjects": {
+    "ws_default_01": "proj_default_01"
+  },
   "projects": [
     {
       "id": "proj_default_01",
       "workspaceId": "ws_default_01",
       "name": "KS Sentinel Core",
       "description": "Primary KS Sentinel 2.0 system development project",
-      "status": "INACTIVE",
+      "status": "ACTIVE",
       "rootPath": "D:\\.vscode\\Coding\\Projects\\antigravity\\KS_Sentinel_2.0",
       "metadata": {
         "color": "#7c4dff",
@@ -19,8 +21,40 @@
         "type": "system"
       },
       "createdAt": "2026-09-05T19:54:46.885Z",
-      "updatedAt": "2026-09-05T20:13:10.146Z",
-      "lastOpenedAt": "2026-09-05T20:12:59.822Z"
+      "updatedAt": "2026-09-20T06:38:56.824Z",
+      "lastOpenedAt": "2026-09-20T06:38:56.824Z"
+    },
+    {
+      "id": "proj_35ea554d6074",
+      "workspaceId": "ws_216ffca4d024",
+      "name": "Sample Project",
+      "description": "Test project for sandboxed file manager",
+      "status": "INACTIVE",
+      "rootPath": "C:\\Users\\Tushar\\AppData\\Local\\Temp\\ks-sentinel-gw-ws-q8TQ4c\\sample-project",
+      "metadata": {
+        "color": "#7c4dff",
+        "tags": [],
+        "type": "general"
+      },
+      "createdAt": "2026-09-20T06:37:50.965Z",
+      "updatedAt": "2026-09-20T06:37:50.965Z",
+      "lastOpenedAt": null
+    },
+    {
+      "id": "proj_2b89d24336c0",
+      "workspaceId": "ws_aa1b05768cb1",
+      "name": "Sample Project",
+      "description": "Test project for sandboxed file manager",
+      "status": "INACTIVE",
+      "rootPath": "C:\\Users\\Tushar\\AppData\\Local\\Temp\\ks-sentinel-gw-ws-YnZGyk\\sample-project",
+      "metadata": {
+        "color": "#7c4dff",
+        "tags": [],
+        "type": "general"
+      },
+      "createdAt": "2026-09-20T06:38:55.982Z",
+      "updatedAt": "2026-09-20T06:38:55.982Z",
+      "lastOpenedAt": null
     }
   ]
 }

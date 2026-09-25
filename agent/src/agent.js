@@ -10,6 +10,7 @@ const { AgentLifecycle, LifecycleState } = require('./lifecycle');
 const { CapabilityRegistry } = require('./capabilities');
 const { AgentHealth } = require('./health');
 const { GatewayClient } = require('./transport/gatewayClient');
+const { CapabilityServer } = require('./transport/capabilityServer');
 const { getMachineInfo } = require('./machine/machineInfo');
 const defaultConfig = require('./config');
 
@@ -19,6 +20,8 @@ class LocalSentinelAgent {
     this.identity = new AgentIdentity(this.config);
     this.lifecycle = new AgentLifecycle();
     this.capabilities = new CapabilityRegistry();
+    this.capabilities = new CapabilityRegistry({ includeFileCapabilities: true });
+    this.capabilityServer = new CapabilityServer(this.identity.agentId, this.capabilities);
     this.transport = new GatewayClient(
       this.config,
       this.identity,
@@ -26,6 +29,8 @@ class LocalSentinelAgent {
       this.capabilities,
       () => this.health.getUptimeSeconds(),
       () => getMachineInfo(this.identity)
+      () => getMachineInfo(this.identity),
+      () => this.capabilityServer.endpoint
     );
     this.health = new AgentHealth(this.identity, this.lifecycle, this.capabilities, this.transport);
     this.reconnectTimer = null;
@@ -51,6 +56,15 @@ class LocalSentinelAgent {
    */
   async start() {
     this.log(`Starting Local Sentinel Agent v${this.identity.agentVersion} (Protocol v${this.identity.protocolVersion})...`);
+
+    // Start loopback capability server
+    try {
+      const endpoint = await this.capabilityServer.start(this.config.agentPort || 0);
+      this.log(`Capability server listening on ${endpoint}`);
+    } catch (err) {
+      this.error('Failed to start capability server', err);
+    }
+
     this.lifecycle.transitionTo(LifecycleState.READY, 'Agent initialization complete');
 
     // Attempt registration with Gateway
@@ -91,6 +105,7 @@ class LocalSentinelAgent {
 
     try {
       this.lifecycle.transitionTo(LifecycleState.STOPPING, reason);
+      await this.capabilityServer.stop();
       await this.transport.disconnect(reason);
     } finally {
       this.lifecycle.transitionTo(LifecycleState.STOPPED, 'Agent stopped cleanly');

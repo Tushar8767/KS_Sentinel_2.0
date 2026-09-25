@@ -12,6 +12,7 @@ const { LifecycleState } = require('../lifecycle');
 
 class GatewayClient {
   constructor(config, identity, lifecycle, capabilities, getUptimeFn, getMachineInfoFn = null) {
+  constructor(config, identity, lifecycle, capabilities, getUptimeFn, getMachineInfoFn = null, getEndpointFn = null) {
     this.gatewayUrl = config.gatewayUrl.replace(/\/+$/, '');
     this.heartbeatIntervalMs = config.heartbeatIntervalMs;
     this.identity = identity;
@@ -19,6 +20,7 @@ class GatewayClient {
     this.capabilities = capabilities;
     this.getUptimeFn = getUptimeFn;
     this.getMachineInfoFn = getMachineInfoFn;
+    this.getEndpointFn = getEndpointFn;
 
     this.heartbeatTimer = null;
     this.connected = false;
@@ -42,6 +44,7 @@ class GatewayClient {
       ...this.identity.toJSON(),
       capabilities: this.capabilities.getCapabilityDescriptors(),
       machineInfo: this.getMachineInfoFn ? this.getMachineInfoFn() : null,
+      endpoint: this.getEndpointFn ? this.getEndpointFn() : null,
       timestamp: new Date().toISOString()
     };
 

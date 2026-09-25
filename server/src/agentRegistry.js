@@ -32,6 +32,8 @@ class GatewayAgentRegistry {
       nodeVersion: String(payload.nodeVersion || 'unknown'),
       capabilities: Array.isArray(payload.capabilities) ? payload.capabilities : [],
       machineInfo: payload.machineInfo || null,
+      endpoint: payload.endpoint ? String(payload.endpoint) : null,
+      capabilityHandler: typeof payload.capabilityHandler === 'function' ? payload.capabilityHandler : null,
       registeredAt: new Date().toISOString(),
       lastSeen: Date.now(),
       state: 'CONNECTED'
@@ -43,6 +45,74 @@ class GatewayAgentRegistry {
       heartbeatIntervalMs: 5000,
       timestamp: new Date().toISOString()
     };
+  }
+
+  /**
+   * Directly assign an in-process capability handler (useful for testing or direct IPC).
+   */
+  setCapabilityHandler(handler) {
+    if (this.activeAgent) {
+      this.activeAgent.capabilityHandler = handler;
+    }
+  }
+
+  /**
+   * Execute an explicit capability on the connected agent.
+   * Dispatches via local loopback HTTP endpoint or direct capability handler.
+   */
+  async executeCapability(capability, params = {}) {
+    const status = this.getStatus();
+    if (!status.connected || !this.activeAgent) {
+      const err = new Error('Local Sentinel Agent is unavailable or offline');
+      err.status = 409;
+      err.code = 'AGENT_UNAVAILABLE';
+      throw err;
+    }
+
+    const hasCap = this.activeAgent.capabilities.some((c) => {
+      const id = typeof c === 'string' ? c : c?.id;
+      const enabled = typeof c === 'object' ? c.enabled !== false : true;
+      return id === capability && enabled;
+    });
+
+    if (!hasCap) {
+      const err = new Error(`Capability '${capability}' is not registered or supported by active agent`);
+      err.status = 400;
+      err.code = 'CAPABILITY_NOT_SUPPORTED';
+      throw err;
+    }
+
+    // Prioritize direct in-process capability handler if registered
+    if (typeof this.activeAgent.capabilityHandler === 'function') {
+      return await this.activeAgent.capabilityHandler(capability, params);
+    }
+
+    // Otherwise dispatch via agent loopback HTTP endpoint
+    if (this.activeAgent.endpoint) {
+      const response = await fetch(`${this.activeAgent.endpoint}/api/capability/execute`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agentId: this.activeAgent.agentId,
+          capability,
+          params
+        })
+      });
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) {
+        const err = new Error(result.error || `Agent capability execution failed with HTTP ${response.status}`);
+        err.status = result.code || response.status || 500;
+        throw err;
+      }
+
+      return result.data;
+    }
+
+    const err = new Error('Local Sentinel Agent capability transport channel is unavailable');
+    err.status = 503;
+    err.code = 'TRANSPORT_UNAVAILABLE';
+    throw err;
   }
 
   /**
