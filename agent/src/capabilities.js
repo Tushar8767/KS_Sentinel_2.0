@@ -37,7 +37,6 @@ const FILE_CAPABILITIES = [
 ];
 
 class CapabilityRegistry {
-  constructor() {
   constructor(options = {}) {
     this.capabilities = new Map();
 
@@ -107,7 +106,6 @@ class CapabilityRegistry {
 }
 
 module.exports = {
-  CapabilityRegistry
   CapabilityRegistry,
   FILE_CAPABILITIES
 };

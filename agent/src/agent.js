@@ -19,7 +19,6 @@ class LocalSentinelAgent {
     this.config = { ...defaultConfig, ...customConfig };
     this.identity = new AgentIdentity(this.config);
     this.lifecycle = new AgentLifecycle();
-    this.capabilities = new CapabilityRegistry();
     this.capabilities = new CapabilityRegistry({ includeFileCapabilities: true });
     this.capabilityServer = new CapabilityServer(this.identity.agentId, this.capabilities);
     this.transport = new GatewayClient(
@@ -28,7 +27,6 @@ class LocalSentinelAgent {
       this.lifecycle,
       this.capabilities,
       () => this.health.getUptimeSeconds(),
-      () => getMachineInfo(this.identity)
       () => getMachineInfo(this.identity),
       () => this.capabilityServer.endpoint
     );

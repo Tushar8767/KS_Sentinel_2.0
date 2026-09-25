@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "activeWorkspaceId": "ws_default_01",
-  "updatedAt": "2026-09-20T06:38:56.820Z",
+  "updatedAt": "2026-09-25T12:45:49.098Z",
   "workspaces": [
     {
       "id": "ws_default_01",
@@ -18,8 +18,8 @@
         ]
       },
       "createdAt": "2026-09-05T16:13:35.530Z",
-      "updatedAt": "2026-09-20T06:38:56.819Z",
-      "lastOpenedAt": "2026-09-20T06:38:56.819Z"
+      "updatedAt": "2026-09-25T12:45:49.098Z",
+      "lastOpenedAt": "2026-09-25T12:45:49.098Z"
     },
     {
       "id": "ws_216ffca4d024",
@@ -49,6 +49,51 @@
       },
       "createdAt": "2026-09-20T06:38:55.978Z",
       "updatedAt": "2026-09-20T06:38:55.978Z",
+      "lastOpenedAt": null
+    },
+    {
+      "id": "ws_2ce50421eae9",
+      "name": "File Manager Test Workspace",
+      "description": "Test workspace for sandboxed file manager",
+      "status": "INACTIVE",
+      "rootPath": "C:\\Users\\Tushar\\AppData\\Local\\Temp\\ks-sentinel-gw-ws-jSC4Kx",
+      "agentId": null,
+      "metadata": {
+        "color": "#00e5ff",
+        "tags": []
+      },
+      "createdAt": "2026-09-25T12:34:56.926Z",
+      "updatedAt": "2026-09-25T12:34:56.926Z",
+      "lastOpenedAt": null
+    },
+    {
+      "id": "ws_928320bbe6b0",
+      "name": "File Manager Test Workspace",
+      "description": "Test workspace for sandboxed file manager",
+      "status": "INACTIVE",
+      "rootPath": "C:\\Users\\Tushar\\AppData\\Local\\Temp\\ks-sentinel-gw-ws-gaksMo",
+      "agentId": null,
+      "metadata": {
+        "color": "#00e5ff",
+        "tags": []
+      },
+      "createdAt": "2026-09-25T12:45:10.531Z",
+      "updatedAt": "2026-09-25T12:45:10.531Z",
+      "lastOpenedAt": null
+    },
+    {
+      "id": "ws_a5d4f8d1e8d3",
+      "name": "File Manager Test Workspace",
+      "description": "Test workspace for sandboxed file manager",
+      "status": "INACTIVE",
+      "rootPath": "C:\\Users\\Tushar\\AppData\\Local\\Temp\\ks-sentinel-gw-ws-Adnvyt",
+      "agentId": null,
+      "metadata": {
+        "color": "#00e5ff",
+        "tags": []
+      },
+      "createdAt": "2026-09-25T12:45:48.192Z",
+      "updatedAt": "2026-09-25T12:45:48.192Z",
       "lastOpenedAt": null
     }
   ]

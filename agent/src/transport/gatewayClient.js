@@ -11,7 +11,6 @@
 const { LifecycleState } = require('../lifecycle');
 
 class GatewayClient {
-  constructor(config, identity, lifecycle, capabilities, getUptimeFn, getMachineInfoFn = null) {
   constructor(config, identity, lifecycle, capabilities, getUptimeFn, getMachineInfoFn = null, getEndpointFn = null) {
     this.gatewayUrl = config.gatewayUrl.replace(/\/+$/, '');
     this.heartbeatIntervalMs = config.heartbeatIntervalMs;

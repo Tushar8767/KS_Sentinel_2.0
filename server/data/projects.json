@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-09-20T06:38:56.825Z",
+  "updatedAt": "2026-09-25T12:45:49.063Z",
   "activeProjects": {
     "ws_default_01": "proj_default_01"
   },
@@ -21,8 +21,8 @@
         "type": "system"
       },
       "createdAt": "2026-09-05T19:54:46.885Z",
-      "updatedAt": "2026-09-20T06:38:56.824Z",
-      "lastOpenedAt": "2026-09-20T06:38:56.824Z"
+      "updatedAt": "2026-09-25T12:45:49.062Z",
+      "lastOpenedAt": "2026-09-25T12:45:49.062Z"
     },
     {
       "id": "proj_35ea554d6074",
@@ -54,6 +54,54 @@
       },
       "createdAt": "2026-09-20T06:38:55.982Z",
       "updatedAt": "2026-09-20T06:38:55.982Z",
+      "lastOpenedAt": null
+    },
+    {
+      "id": "proj_7ee05372bb5c",
+      "workspaceId": "ws_2ce50421eae9",
+      "name": "Sample Project",
+      "description": "Test project for sandboxed file manager",
+      "status": "INACTIVE",
+      "rootPath": "C:\\Users\\Tushar\\AppData\\Local\\Temp\\ks-sentinel-gw-ws-jSC4Kx\\sample-project",
+      "metadata": {
+        "color": "#7c4dff",
+        "tags": [],
+        "type": "general"
+      },
+      "createdAt": "2026-09-25T12:34:56.930Z",
+      "updatedAt": "2026-09-25T12:34:56.930Z",
+      "lastOpenedAt": null
+    },
+    {
+      "id": "proj_f45969d990f7",
+      "workspaceId": "ws_928320bbe6b0",
+      "name": "Sample Project",
+      "description": "Test project for sandboxed file manager",
+      "status": "INACTIVE",
+      "rootPath": "C:\\Users\\Tushar\\AppData\\Local\\Temp\\ks-sentinel-gw-ws-gaksMo\\sample-project",
+      "metadata": {
+        "color": "#7c4dff",
+        "tags": [],
+        "type": "general"
+      },
+      "createdAt": "2026-09-25T12:45:10.536Z",
+      "updatedAt": "2026-09-25T12:45:10.536Z",
+      "lastOpenedAt": null
+    },
+    {
+      "id": "proj_96cf82f21c38",
+      "workspaceId": "ws_a5d4f8d1e8d3",
+      "name": "Sample Project",
+      "description": "Test project for sandboxed file manager",
+      "status": "INACTIVE",
+      "rootPath": "C:\\Users\\Tushar\\AppData\\Local\\Temp\\ks-sentinel-gw-ws-Adnvyt\\sample-project",
+      "metadata": {
+        "color": "#7c4dff",
+        "tags": [],
+        "type": "general"
+      },
+      "createdAt": "2026-09-25T12:45:48.195Z",
+      "updatedAt": "2026-09-25T12:45:48.195Z",
       "lastOpenedAt": null
     }
   ]

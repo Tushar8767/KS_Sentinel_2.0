@@ -5,9 +5,9 @@ const helmet = require('helmet');
 const app = express();
 
 // Security Middlewares
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: process.env.CORS_ORIGIN || true,
   credentials: true
 }));
 app.use(express.json());
@@ -358,7 +358,20 @@ app.get('/api/files/content', async (req, res) => {
   }
 });
 
-// 404 Handler
+// --- Static Client Serving (Production / Render) ---
+const fs = require('fs');
+const path = require('path');
+const clientDistPath = path.resolve(__dirname, '../../client/dist');
+
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.resolve(clientDistPath, 'index.html'));
+  });
+}
+
+// 404 Handler for API endpoints
 app.use((req, res) => {
   res.status(404).json({
     error: 'Endpoint not found',
